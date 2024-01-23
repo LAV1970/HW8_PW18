@@ -1,14 +1,20 @@
 from mongoengine import Document, StringField, ReferenceField, connect
 
 # Подключение к MongoDB
-password = "2g7aV0LR9IzD2lSD"
-connect(f"mongodb+srv://lomakindec1970:{password}@hw8pw18.dxhfdeb.mongodb.net/")
+password = "dhZoZdqOiQ0itI4L"
+database_name = "hw8pw18"
+
+connect(
+    db=database_name,
+    username="lomakindec1970",
+    password=password,
+    host="hw8pw18.dxhfdeb.mongodb.net",
+    alias="default",
+)
 
 
 class Author(Document):
-    name = StringField(
-        required=True, max_length=100, unique=True
-    )  # Добавлен параметр unique
+    name = StringField(required=True, max_length=100, unique=True)
 
 
 class Quote(Document):
