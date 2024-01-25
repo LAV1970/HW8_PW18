@@ -42,29 +42,14 @@ class Quote(Document):
 # Загрузка данных из JSON-файлов
 
 # Загрузка авторов
-with open("authors.json", "r", encoding="utf-8") as file:
-    authors_data = json.load(file)
+file_path = "authors.json"  # Updated file path
+try:
+    with open(file_path, "r", encoding="utf-8") as file:
+        authors_data = json.load(file)
 
-for author_data in authors_data:
-    author = Author(**author_data)
-    author.save()
+    for author_data in authors_data:
+        author = Author(**author_data)
+        author.save()
 
-# Загрузка цитат
-with open("quotes.json", "r", encoding="utf-8") as file:
-    quotes_data = json.load(file)
-
-for quote_data in quotes_data:
-    # Находим соответствующего автора
-    author = Author.objects.get(fullname=quote_data["author"])
-
-    # Создаем экземпляр цитаты
-    quote = Quote(
-        content=quote_data["quote"],
-        author=author,
-        tags=quote_data["tags"],
-        quote=quote_data["quote"],
-        created_at=datetime.now(),
-    )
-    quote.save()
-
-print("Данные успешно загружены в базу данных.")
+except Exception as e:
+    print(f"Error loading authors: {e}")
