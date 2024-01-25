@@ -8,7 +8,7 @@ from mongoengine import (
 )
 
 # Подключение к MongoDB
-password = "UyqF8wsfUpAYMOfN"
+password = "cRLLsF3zdTdGEC5X"
 database_name = "hw8pw18"
 
 connect(
