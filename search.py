@@ -38,15 +38,7 @@ class Quote(Document):
     created_at = DateTimeField()
 
 
-def search_quotes_by_tags(tags):
-    quotes = Quote.objects(tags__in=tags)
-    print("Search Results:")
-    for quote in quotes:
-        print(f"Author: {quote.author.fullname}, Quote: {quote.content}")
-    print("\n")
-
-
-def search_quotes_by_author(author_name):
+def search_quotes_by_name(author_name):
     author = Author.objects(name=author_name).first()
     if author:
         quotes = Quote.objects(author=author)
@@ -58,40 +50,42 @@ def search_quotes_by_author(author_name):
         print(f"Author '{author_name}' not found.\n")
 
 
-def search_quotes_by_tags_and_author(tags, author_name):
-    author = Author.objects(name=author_name).first()
-    if author:
-        quotes = Quote.objects(tags__in=tags, author=author)
-        print("Search Results:")
-        for quote in quotes:
-            print(f"Quote: {quote.content}")
-        print("\n")
-    else:
-        print(f"Author '{author_name}' not found.\n")
+def search_quotes_by_tag(tag):
+    quotes = Quote.objects(tags=tag)
+    print("Search Results:")
+    for quote in quotes:
+        print(f"Author: {quote.author.fullname}, Quote: {quote.content}")
+    print("\n")
+
+
+def search_quotes_by_tags(tags):
+    quotes = Quote.objects(tags__in=tags)
+    print("Search Results:")
+    for quote in quotes:
+        print(f"Author: {quote.author.fullname}, Quote: {quote.content}")
+    print("\n")
 
 
 def main():
     while True:
-        user_input = input("Enter command (tags, author, exit): ")
-        if user_input == "exit":
+        user_input = input(
+            "Enter command (name:<author_name>, tag:<tag>, tags:<tag1>,<tag2>, exit): "
+        ).strip()
+        if user_input.lower() == "exit":
             print("Exiting the program.")
             break
-        elif user_input == "tags":
-            tags_input = input("Enter tags (comma-separated): ")
+        elif user_input.startswith("name:"):
+            author_name = user_input[5:].strip()
+            search_quotes_by_name(author_name)
+        elif user_input.startswith("tag:"):
+            tag = user_input[4:].strip()
+            search_quotes_by_tag(tag)
+        elif user_input.startswith("tags:"):
+            tags_input = user_input[5:].strip()
             tags = [tag.strip() for tag in tags_input.split(",")]
             search_quotes_by_tags(tags)
-        elif user_input == "author":
-            author_name = input("Enter author name: ")
-            search_quotes_by_author(author_name)
-        elif user_input == "both":
-            tags_input = input("Enter tags (comma-separated): ")
-            tags = [tag.strip() for tag in tags_input.split(",")]
-            author_name = input("Enter author name: ")
-            search_quotes_by_tags_and_author(tags, author_name)
         else:
-            print(
-                "Invalid command. Please enter 'tags', 'author', 'both', or 'exit'.\n"
-            )
+            print("Invalid command. Please enter a valid command or 'exit'.\n")
 
 
 if __name__ == "__main__":
