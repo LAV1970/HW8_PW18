@@ -8,7 +8,7 @@ from mongoengine import (
 )
 
 # Подключение к MongoDB
-password = "dhZoZdqOiQ0itI4L"
+password = "UyqF8wsfUpAYMOfN"
 database_name = "hw8pw18"
 
 connect(
@@ -41,12 +41,14 @@ try:
     # Создаем авторов из JSON
     authors_data = [
         {
+            "name": "albert_einstein",  # Добавим поле name
             "fullname": "Albert Einstein",
             "born_date": "March 14, 1879",
             "born_location": "in Ulm, Germany",
             "description": "In 1879, Albert Einstein was born in Ulm, Germany. He completed his Ph.D. at the University of Zurich by 1909. His 1905 paper explaining the photoelectric effect, the basis of electronics, earned him the Nobel Prize in 1921...",
         },
         {
+            "name": "steve_martin",  # Добавим поле name
             "fullname": "Steve Martin",
             "born_date": "August 14, 1945",
             "born_location": "in Waco, Texas, The United States",
