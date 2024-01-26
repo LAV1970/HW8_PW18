@@ -8,6 +8,14 @@ from mongoengine import (
 )
 from datetime import datetime
 
+from redis import StrictRedis
+
+# Создаем подключение к Redis
+redis_client = StrictRedis(host="localhost", port=6379, db=0, decode_responses=True)
+
+# Время жизни кеша в секундах (например, 1 час)
+CACHE_EXPIRATION_TIME = 3600
+
 # Подключение к MongoDB
 password = "cRLLsF3zdTdGEC5X"
 database_name = "hw8pw18"
@@ -39,31 +47,39 @@ class Quote(Document):
 
 
 def search_quotes_by_name(author_name):
-    author = Author.objects(name=author_name).first()
+    # Проверяем, есть ли результат в кеше
+    cached_result = redis_client.get(f"author_search:{author_name}")
+    if cached_result:
+        print("Search Results (from cache):")
+        print(cached_result)
+        print("\n")
+        return
+
+    author = Author.objects(name__istartswith=author_name).first()
     if author:
         quotes = Quote.objects(author=author)
-        print("Search Results:")
+        result = f"Search Results:\n"
         for quote in quotes:
-            print(f"Quote: {quote.content}")
-        print("\n")
+            result += f"Quote: {quote.content}\n"
+        print(result)
+
+        # Сохраняем результат в кеш
+        redis_client.setex(
+            f"author_search:{author_name}", CACHE_EXPIRATION_TIME, result
+        )
     else:
         print(f"Author '{author_name}' not found.\n")
 
 
-def search_quotes_by_tag(tag):
-    quotes = Quote.objects(tags=tag)
-    print("Search Results:")
-    for quote in quotes:
-        print(f"Author: {quote.author.fullname}, Quote: {quote.content}")
-    print("\n")
-
-
 def search_quotes_by_tags(tags):
     quotes = Quote.objects(tags__in=tags)
-    print("Search Results:")
+    result = f"Search Results:\n"
     for quote in quotes:
-        print(f"Author: {quote.author.fullname}, Quote: {quote.content}")
-    print("\n")
+        result += f"Author: {quote.author.fullname}, Quote: {quote.content}\n"
+    print(result)
+
+    # Сохраняем результат в кеш
+    redis_client.setex(f"tag_search:{tags}", CACHE_EXPIRATION_TIME, result)
 
 
 def main():
@@ -79,7 +95,7 @@ def main():
             search_quotes_by_name(author_name)
         elif user_input.startswith("tag:"):
             tag = user_input[4:].strip()
-            search_quotes_by_tag(tag)
+            search_quotes_by_tags(tags)
         elif user_input.startswith("tags:"):
             tags_input = user_input[5:].strip()
             tags = [tag.strip() for tag in tags_input.split(",")]
