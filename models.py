@@ -7,15 +7,14 @@ from mongoengine import (
     connect,
 )
 
-# Подключение к MongoDB
-password = "cRLLsF3zdTdGEC5X"
+password = "4j5hUePFV62x1oNV"
 database_name = "hw8pw18"
 
 connect(
     db=database_name,
     username="lomakindec1970",
     password=password,
-    host="hw8pw18.dxhfdeb.mongodb.net",
+    host="mongodb+srv://hw8pw18.dxhfdeb.mongodb.net/Beispiel.beispiel",  # Updated URI
     alias="default",
 )
 
