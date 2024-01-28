@@ -5,36 +5,43 @@ from contacts import Contact
 connection = pika.BlockingConnection(pika.ConnectionParameters("localhost"))
 channel = connection.channel()
 
-# Создание очереди с именем 'email_queue'
+# Создание очередей с именами 'email_queue' и 'sms_queue'
 channel.queue_declare(queue="email_queue")
+channel.queue_declare(queue="sms_queue")
 
-# Генерация сообщений и отправка их в очередь
+# Генерация контактов и отправка их в соответствующие очереди
 try:
-    # Создаем контакты
     contacts_data = [
         {
             "full_name": "John Doe",
             "email": "john.doe@example.com",
+            "phone_number": "+123456789",
+            "preferred_contact_method": "email",
             "message_sent": False,
         },
         {
             "full_name": "Jane Smith",
             "email": "jane.smith@example.com",
+            "phone_number": "+987654321",
+            "preferred_contact_method": "sms",
             "message_sent": False,
         },
         # Добавьте другие контакты по мере необходимости
     ]
 
     for contact_data in contacts_data:
-        # Создаем контакт
         contact = Contact(**contact_data)
         contact.save()
 
-        # Отправка сообщения в очередь с ObjectID контакта
         message = str(contact.id)
-        channel.basic_publish(exchange="", routing_key="email_queue", body=message)
 
-        print(f" [x] Sent '{message}'")
+        # Отправка сообщения в соответствующую очередь в зависимости от предпочтительного метода связи
+        if contact.preferred_contact_method == "email":
+            channel.basic_publish(exchange="", routing_key="email_queue", body=message)
+        elif contact.preferred_contact_method == "sms":
+            channel.basic_publish(exchange="", routing_key="sms_queue", body=message)
+
+        print(f" [x] Sent '{message}' to {contact.preferred_contact_method}")
 
 except Exception as e:
     print(f"Error creating contacts and sending messages: {e}")

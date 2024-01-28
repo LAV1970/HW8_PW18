@@ -1,10 +1,12 @@
-from mongoengine import Document, StringField, BooleanField
+from mongoengine import Document, StringField, BooleanField, EmailField
 
 
 class Contact(Document):
     full_name = StringField(required=True, max_length=100)
-    email = StringField(required=True, max_length=100, unique=True)
+    email = EmailField(required=True, unique=True)
+    phone_number = StringField(max_length=20)
     message_sent = BooleanField(default=False)
+    preferred_contact_method = StringField(choices=["email", "sms"], default="email")
 
 
 def create_contact():
