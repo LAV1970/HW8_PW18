@@ -1,4 +1,11 @@
 import pika
+from mongoengine import Document, StringField, BooleanField
+
+
+class Contact(Document):
+    full_name = StringField(required=True, max_length=100)
+    email = StringField(required=True, max_length=100, unique=True)
+    message_sent = BooleanField(default=False)
 
 
 # Callback-функция для обработки сообщений
